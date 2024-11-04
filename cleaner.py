@@ -2,6 +2,7 @@
 # Coulnd't find a python script to do this job so I figured why not give it a try.
 
 import os
+from dotenv import load_dotenv
 import asyncio
 import logging
 import requests

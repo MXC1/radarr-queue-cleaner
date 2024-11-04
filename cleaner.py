@@ -133,10 +133,12 @@ def download_has_not_moved(item):
             # logging.info(f'{item["title"]}')
             logging.info(f'has no previous timedelta')
             return False
-        if prev_timedelta >= current_timedelta:
+        if current_timedelta >= prev_timedelta:
             # logging.info(f'{item["title"]}')
-            logging.info(f'is not moving')
+            logging.info(f'ETA is going up or is stagnant')
             return True
+        logging.info(f'ETA is going down')
+        return False
     else:
         # logging.info(f'{item["title"]}')
         logging.info(f'does not have a timeleft key')

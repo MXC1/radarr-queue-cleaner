@@ -82,5 +82,6 @@ async def main():
         await asyncio.sleep(API_TIMEOUT)
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()  # Create a new event loop
+    asyncio.set_event_loop(loop)     # Set it as the current event loop
     loop.run_until_complete(main())

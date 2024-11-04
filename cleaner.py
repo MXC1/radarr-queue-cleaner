@@ -22,7 +22,7 @@ logging.basicConfig(
 RADARR_API_URL = "http://localhost:7878/api/v3"
 load_dotenv()
 RADARR_API_KEY = os.getenv('RADARR_API_KEY')
-API_TIMEOUT = 1  # Timeout for API requests in seconds
+API_TIMEOUT = int(os.getenv('API_TIMEOUT'))  # Timeout for API requests in seconds
 
 # Function to make API requests with error handling
 async def make_api_request(url, api_key, params=None):

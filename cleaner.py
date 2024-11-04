@@ -15,16 +15,10 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
-# Sonarr and Radarr API endpoints
-SONARR_API_URL = (os.environ['SONARR_URL']) + "/api/v3"
-RADARR_API_URL = (os.environ['RADARR_URL']) + "/api/v3"
-
-# API key for Sonarr and Radarr
-SONARR_API_KEY = (os.environ['SONARR_API_KEY'])
-RADARR_API_KEY = (os.environ['RADARR_API_KEY'])
-
-# Timeout for API requests in seconds
-API_TIMEOUT = int(os.environ['API_TIMEOUT']) # 10 minutes
+# Radarr API endpoint and key
+RADARR_API_URL = "http://localhost:7878/api/v3"
+RADARR_API_KEY = os.environ['RADARR_API_KEY']
+API_TIMEOUT = 3600  # Timeout for API requests in seconds
 
 # Function to make API requests with error handling
 async def make_api_request(url, api_key, params=None):
@@ -53,26 +47,8 @@ async def make_api_delete(url, api_key, params=None):
     except ValueError as e:
         logging.error(f'Error parsing JSON response from {url}: {e}')
         return None
-    
-# Function to remove stalled Sonarr downloads
-async def remove_stalled_sonarr_downloads():
-    logging.info('Checking Sonarr queue...')
-    sonarr_url = f'{SONARR_API_URL}/queue'
-    sonarr_queue = await make_api_request(sonarr_url, SONARR_API_KEY, {'page': '1', 'pageSize': await count_records(SONARR_API_URL,SONARR_API_KEY)})
-    if sonarr_queue is not None and 'records' in sonarr_queue:
-        logging.info('Processing Sonarr queue...')
-        for item in sonarr_queue['records']:
-            if 'title' in item and 'status' in item and 'trackedDownloadStatus' in item:
-                logging.info(f'Checking the status of {item["title"]}')
-                if item['status'] == 'warning' and item['errorMessage'] == 'The download is stalled with no connections':
-                    logging.info(f'Removing stalled Sonarr download: {item["title"]}')
-                    await make_api_delete(f'{SONARR_API_URL}/queue/{item["id"]}', SONARR_API_KEY, {'removeFromClient': 'true', 'blocklist': 'true'})
-            else:
-                logging.warning('Skipping item in Sonarr queue due to missing or invalid keys')
-    else:
-        logging.warning('Sonarr queue is None or missing "records" key')
 
-# Function to remove stalled Radarr downloads
+# Function to remove stalled Radarr downloads after three consecutive stalls
 async def remove_stalled_radarr_downloads():
     logging.info('Checking radarr queue...')
     radarr_url = f'{RADARR_API_URL}/queue'
@@ -101,7 +77,6 @@ async def count_records(API_URL, API_Key):
 async def main():
     while True:
         logging.info('Running media-tools script')
-        await remove_stalled_sonarr_downloads()
         await remove_stalled_radarr_downloads()
         logging.info('Finished running media-tools script. Sleeping for 10 minutes.')
         await asyncio.sleep(API_TIMEOUT)

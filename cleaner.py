@@ -6,13 +6,15 @@ import asyncio
 import logging
 import requests
 from requests.exceptions import RequestException
-import json
 
-# Set up logging
+# Set up logging to write to a file
 logging.basicConfig(
-    format='%(asctime)s [%(levelname)s]: %(message)s', 
-    level=logging.INFO, 
-    handlers=[logging.StreamHandler()]
+    format='%(asctime)s [%(levelname)s]: %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler("app.log"),  # Specify the log file
+        logging.StreamHandler()  # Optional: StreamHandler for when running with python
+    ]
 )
 
 # Radarr API endpoint and key

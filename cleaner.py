@@ -80,7 +80,8 @@ async def main():
     while True:
         logging.info('Running media-tools script')
         await remove_stalled_radarr_downloads()
-        logging.info('Finished running media-tools script. Sleeping for 10 minutes.')
+        minutes = int(API_TIMEOUT / 60)
+        logging.info(f'Finished running media-tools script. Sleeping for {minutes} minutes.')
         await asyncio.sleep(API_TIMEOUT)
 
 if __name__ == '__main__':
